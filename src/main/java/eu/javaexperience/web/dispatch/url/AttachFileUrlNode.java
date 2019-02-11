@@ -136,17 +136,17 @@ public class AttachFileUrlNode extends URLNode
 		try
 		{
 			AbstractFile f = rootPath.getFileSystem().fromUri(sb.toString());
+			if(null == f || !f.exists())
+			{
+				return false;
+			}
+			
 			if(followSymlinks)
 			{
 				f = f.getCanonicalFile();
 			}
 			String fstr = f.getUrl();
 			if(fstr.indexOf(rootUrl)!=0)
-			{
-				return false;
-			}
-			
-			if(!f.exists())
 			{
 				return false;
 			}

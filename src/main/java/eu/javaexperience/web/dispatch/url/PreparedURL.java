@@ -15,6 +15,7 @@ import eu.javaexperience.collection.map.NullMap;
 import eu.javaexperience.reflect.Mirror;
 import eu.javaexperience.semantic.references.MayNull;
 import eu.javaexperience.text.StringTools;
+import eu.javaexperience.url.UrlBuilder;
 import eu.javaexperience.url.UrlTools;
 import eu.javaexperience.web.HttpTools;
 
@@ -68,9 +69,6 @@ public class PreparedURL
 	
 	protected int domainSize;
 	
-	public static final Pattern domSplit = Pattern.compile("\\.");
-	public static final Pattern pathSplit = Pattern.compile("/+");
-	
 	public PreparedURL(String protocol,String user,String domain,int port, int defaultPort, String path,String params)
 	{
 		process(protocol, user, domain, port,  defaultPort, path, params);
@@ -78,7 +76,6 @@ public class PreparedURL
 	
 	public PreparedURL(HttpServletRequest req)
 	{
-		//this(req.getProtocol(),req.getRemoteUser(),req.getServerName(),req.getServerPort(),req.getRequestURI(),convMapMulti(req.getParameterMap()));
 		process(req.getRequestURL().toString());
 	}
 	
@@ -94,7 +91,7 @@ public class PreparedURL
 	
 	protected void process(String protocol,String user,String domain,int port, int defaultPort, String path,String params)
 	{
-		process(protocol,user,domain,port, defaultPort, path,params == null? null:HttpTools.resolvMap(params));
+		process(protocol,user,domain,port, defaultPort, path,params == null? null:UrlTools.resolvMap(params));
 	}
 	
 	private void process(String url)
@@ -116,11 +113,11 @@ public class PreparedURL
 		this.user = user;
 		this.port = port;
 		this.defaultPort = defaultPort;
-		String[] doma = domSplit.split(domain);
+		String[] doma = UrlTools.domSplit.split(domain);
 		
 		domainSize = doma.length;
 		
-		String[] paths = StringTools.whitoutNullAndEmptyString(pathSplit.split(path));
+		String[] paths = StringTools.whitoutNullAndEmptyString(UrlTools.pathSplit.split(path));
 		
 		UrlTools.modifyUrlDecode(paths);
 		
@@ -382,7 +379,7 @@ public class PreparedURL
 	public String getQuery()
 	{
 		StringBuilder sb = new StringBuilder();
-		HttpTools.renderRequestParams(params, sb);
+		UrlTools.renderRequestParams(params, sb);
 		return sb.toString();
 	}
 
@@ -436,7 +433,7 @@ public class PreparedURL
 			
 			if(reqParam)
 			{
-				HttpTools.renderRequestParams(params, sb);
+				UrlTools.renderRequestParams(params, sb);
 			}
 		}
 		return sb.toString();

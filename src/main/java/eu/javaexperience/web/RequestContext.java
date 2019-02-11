@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.javaexperience.collection.map.SmallMap;
+import eu.javaexperience.url.UrlTools;
 import eu.javaexperience.web.dispatch.url.PreparedURL;
 
 public class RequestContext extends AbstractContext
@@ -64,7 +65,7 @@ public class RequestContext extends AbstractContext
 			sb.append("\n");
 			
 			sb.append("\tRequestParameters: ");
-			sb.append(HttpTools.renderRequestParams((Map)getRequest().getParameterMap()));
+			sb.append(UrlTools.renderRequestParams((Map)getRequest().getParameterMap()));
 			sb.append("\n");
 			
 			sb.append("\tUserAgent: ");

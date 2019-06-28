@@ -293,6 +293,21 @@ public class HttpTools
 		return ret;
 	}
 	
+	public static Map<String, String> convertFromMultiToMap(Map<String, String[]> params)
+	{
+		SmallMap<String, String> ret = new SmallMap<>();
+		for(Entry<String, String[]> p:params.entrySet())
+		{
+			String[] v = p.getValue();
+			if(null != v && v.length > 0)
+			{
+				ret.put(p.getKey(), v[0]);
+			}
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 * A végén \r\n-el zárva
 	 * */

@@ -52,7 +52,7 @@ public abstract class JavaInstanceUrlNode extends URLNode
 	
 	protected void loadFunction()
 	{
-		for(Method m:Mirror.getClassData(this.getCanonicalURL()).getAllMethods())
+		for(Method m:Mirror.getClassData(this.getClass()).getAllMethods())
 		{
 			if(!Modifier.isStatic(m.getModifiers()) && Modifier.isPublic(m.getModifiers()))
 			{

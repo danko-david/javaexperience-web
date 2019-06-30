@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.javaexperience.file.AbstractFile;
+import eu.javaexperience.interfaces.simple.getBy.GetBy1;
 import eu.javaexperience.io.IOTools;
 import eu.javaexperience.io.file.FileTools;
 import eu.javaexperience.reflect.Mirror;
@@ -113,6 +114,20 @@ public class AttachFileUrlNode extends URLNode
 		this.listDir = listDir;
 	}
 	
+	public static final GetBy1<String, AbstractFile> DEFAULT_MIME_RECOGNISER = (f)->MIME.recogniseFileExtension(f.getUrl()).mime;
+	
+	protected GetBy1<String, AbstractFile> mimeRecogniser;
+	
+	public GetBy1<String, AbstractFile> getMimeRecogniser()
+	{
+		return mimeRecogniser;
+	}
+
+	public void setMimeRecogniser(GetBy1<String, AbstractFile> mimeRecogniser)
+	{
+		this.mimeRecogniser = mimeRecogniser;
+	}
+	
 	@Override
 	public boolean dispatch(Context ctx)
 	{
@@ -169,7 +184,7 @@ public class AttachFileUrlNode extends URLNode
 				{
 					StringBuilder c = new StringBuilder();
 					c.append("<html><head><meta charset=\"utf-8\"><title>");
-						c.append("Listting directory: ");
+						c.append("Listing directory: ");
 						c.append(webFile.toString());
 					c.append("</title></head><body><table>");
 					
@@ -214,10 +229,10 @@ public class AttachFileUrlNode extends URLNode
 				}
 				else
 				{
-					MIME mime = MIME.recogniseFileExtension(fstr);
 					int len = (int) f.getSize();
 					resp.setContentLength(len);
-					resp.setContentType(mime.mime);
+					
+					resp.setContentType(mimeRecogniser.getBy(f));
 					try(InputStream is = f.openRead())
 					{
 						IOTools.copyStream(is, ctx.getResponse().getOutputStream());
@@ -238,5 +253,4 @@ public class AttachFileUrlNode extends URLNode
 		}
 		return true;
 	}
-	
 }

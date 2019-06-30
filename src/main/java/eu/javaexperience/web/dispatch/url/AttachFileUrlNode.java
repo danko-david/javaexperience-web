@@ -1,5 +1,6 @@
 package eu.javaexperience.web.dispatch.url;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import eu.javaexperience.file.AbstractFile;
 import eu.javaexperience.interfaces.simple.getBy.GetBy1;
+import eu.javaexperience.interfaces.simple.publish.SimplePublish2;
 import eu.javaexperience.io.IOTools;
 import eu.javaexperience.io.file.FileTools;
 import eu.javaexperience.reflect.Mirror;
@@ -128,6 +130,36 @@ public class AttachFileUrlNode extends URLNode
 		this.mimeRecogniser = mimeRecogniser;
 	}
 	
+	public static final SimplePublish2<Context, AbstractFile> DEFAULT_FILE_OUTPUT_METHOD = new SimplePublish2<Context, AbstractFile>()
+	{
+		@Override
+		public void publish(Context ctx, AbstractFile f)
+		{
+			int len = (int) f.getSize();
+			ctx.getResponse().setContentLength(len);
+			try(InputStream is = f.openRead())
+			{
+				IOTools.copyStream(is, ctx.getResponse().getOutputStream());
+			}
+			catch (IOException e)
+			{
+				Mirror.propagateAnyway(e);
+			}
+		}
+	};
+	
+	protected SimplePublish2<Context, AbstractFile> fileOutputMethod = DEFAULT_FILE_OUTPUT_METHOD;
+	
+	public SimplePublish2<Context, AbstractFile> getFileOutputMethod()
+	{
+		return fileOutputMethod;
+	}
+
+	public void setFileOutputMethod(SimplePublish2<Context, AbstractFile> fileOutputMethod)
+	{
+		this.fileOutputMethod = fileOutputMethod;
+	}
+	
 	@Override
 	public boolean dispatch(Context ctx)
 	{
@@ -229,14 +261,8 @@ public class AttachFileUrlNode extends URLNode
 				}
 				else
 				{
-					int len = (int) f.getSize();
-					resp.setContentLength(len);
-					
 					resp.setContentType(mimeRecogniser.getBy(f));
-					try(InputStream is = f.openRead())
-					{
-						IOTools.copyStream(is, ctx.getResponse().getOutputStream());
-					}
+					getFileOutputMethod().publish(ctx, f);
 					ctx.finishOperation();
 				}
 				

@@ -118,7 +118,7 @@ public class AttachFileUrlNode extends URLNode
 	
 	public static final GetBy1<String, AbstractFile> DEFAULT_MIME_RECOGNISER = (f)->MIME.recogniseFileExtension(f.getUrl()).mime;
 	
-	protected GetBy1<String, AbstractFile> mimeRecogniser;
+	protected GetBy1<String, AbstractFile> mimeRecogniser = DEFAULT_MIME_RECOGNISER;
 	
 	public GetBy1<String, AbstractFile> getMimeRecogniser()
 	{

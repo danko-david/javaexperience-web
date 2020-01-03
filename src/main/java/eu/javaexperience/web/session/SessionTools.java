@@ -1,7 +1,10 @@
 package eu.javaexperience.web.session;
 
+import java.util.concurrent.ConcurrentMap;
+
 import javax.servlet.http.Cookie;
 
+import eu.javaexperience.text.StringTools;
 import eu.javaexperience.web.Context;
 import eu.javaexperience.web.HttpTools;
 import eu.javaexperience.web.Session;
@@ -70,6 +73,21 @@ public class SessionTools
 		session.updateUseSession(ctx);
 		
 		return session;
+	}
+	
+	public static final String assignSessionId(Session session,ConcurrentMap<String, Session> map)
+	{
+		out:while(true)
+		{
+			String sess = StringTools.randomString(25);
+			{
+				Session ret = map.putIfAbsent(sess, session);
+				if(ret != null)
+					continue out;
+			}
+			session.setId(sess);
+			return sess;
+		}
 	}
 	
 	public static Session createSession(SessionManager manager)

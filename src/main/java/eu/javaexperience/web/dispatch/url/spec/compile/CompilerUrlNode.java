@@ -29,7 +29,7 @@ public class CompilerUrlNode extends CachedSaltedContentUrlNode
 		refresh();
 	}
 	
-	public CachedSaltedContentUrlNode refresh()
+	public synchronized CachedSaltedContentUrlNode refresh()
 	{
 		callbackInvalidate();
 		if(!production)
@@ -48,7 +48,7 @@ public class CompilerUrlNode extends CachedSaltedContentUrlNode
 		return this;
 	}
 	
-	public boolean checkModificationRefreshIfNeeded()
+	public synchronized boolean checkModificationRefreshIfNeeded()
 	{
 		if(!production)
 		{

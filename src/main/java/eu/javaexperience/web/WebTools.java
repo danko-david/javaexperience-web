@@ -1,9 +1,17 @@
 package eu.javaexperience.web;
 
+import java.io.InputStream;
+import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+
+import eu.javaexperience.io.IOTools;
+import eu.javaexperience.reflect.Mirror;
 import eu.javaexperience.regex.RegexTools;
+import eu.javaexperience.semantic.references.MayNull;
 import eu.javaexperience.text.StringTools;
+import eu.javaexperience.url.UrlTools;
 
 public class WebTools
 {
@@ -36,5 +44,44 @@ public class WebTools
 	public static void main(String[] args)
 	{
 		System.out.println(asSeoName("16 db ärvíztűrő_tüköR-FŰRŐGép"));
+	}
+	
+	public static void acceptPostRequests(Context ctx, @MayNull Map<String, String[]> postRequestParams)
+	{
+		try
+		{
+			HttpServletRequest request = ctx.getRequest();
+			InputStream is = request.getInputStream();
+			
+			int n = request.getContentLength();
+			int ava = is.available();
+			if(n <= 0 && ava > 0)
+				n = is.available();
+			
+			byte[] data = null;
+			if(n > 0)
+			{
+				data = new byte[n];
+				IOTools.readFull(is, data);
+			}
+			else
+			{
+				data = IOTools.loadAllAvailableFromInputStream(is);
+			}
+			
+			try
+			{
+				if(null != postRequestParams)
+				{
+					UrlTools.processArgsRequest(new String(data), postRequestParams);
+				}
+			}
+			catch(Exception e){}
+			request.setAttribute("data", data);
+		}
+		catch(Exception e)
+		{
+			Mirror.propagateAnyway(e);
+		}
 	}
 }

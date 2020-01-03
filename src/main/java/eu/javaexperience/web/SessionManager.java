@@ -3,7 +3,6 @@ package eu.javaexperience.web;
 import java.util.Map.Entry;
 import java.util.Set;
 
-//TODO rewrite
 public interface SessionManager
 {
 	public void destroySession(String str);
@@ -19,4 +18,6 @@ public interface SessionManager
 	public Set<Entry<String, Session>> listAllSession();
 
 	public void addSessionWithId(String sessionCookieValue, Session sess);
+	
+	public void housekeep();
 }

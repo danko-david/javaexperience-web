@@ -2,6 +2,7 @@ package eu.javaexperience.web.dispatch.url;
 
 import java.util.ArrayList;
 
+import eu.javaexperience.patterns.behavioral.mediator.EventMediator;
 import eu.javaexperience.web.Context;
 import eu.javaexperience.web.HttpTools;
 import eu.javaexperience.web.facility.SiteFacilityTools;
@@ -15,6 +16,13 @@ public abstract class CachedSaltedContentUrlNode extends SimpleCachedContentUrlN
 	protected boolean checkModifiedOnRequest;
 	
 	protected boolean redirectToSalt;
+	
+	protected EventMediator<CachedSaltedContentUrlNode> onRefreshed = new EventMediator<>();
+	
+	public EventMediator<CachedSaltedContentUrlNode> getRefreshListener()
+	{
+		return onRefreshed;
+	}
 	
 	public CachedSaltedContentUrlNode(String name, String mime)
 	{
@@ -82,13 +90,19 @@ public abstract class CachedSaltedContentUrlNode extends SimpleCachedContentUrlN
 		lastModified = determineLastModified();
 		data = transform(loadContent());
 		salt.setName(HttpTools.toCacheSaltHexa(lastModified));
-		callbackRefreshed();
+		eventRefreshed();
 		return this;
 	}
 	
 	public void callbackInvalidate()
 	{
 		
+	}
+	
+	protected void eventRefreshed()
+	{
+		onRefreshed.dispatchEvent(this);
+		callbackRefreshed();
 	}
 	
 	protected void callbackRefreshed()

@@ -149,9 +149,17 @@ public class InMemorySessionManager implements SessionManager
 	}
 
 	@Override
-	public void destroySession(Context ctx) {
-		// TODO Auto-generated method stub
-		
+	public void destroySession(Context ctx)
+	{
+		Session sess = ctx.getSession();
+		if(null != sess)
+		{
+			String id = sess.getId();
+			if(null != id)
+			{
+				destroySession(id);
+			}
+		}
 	}
 
 	@Override

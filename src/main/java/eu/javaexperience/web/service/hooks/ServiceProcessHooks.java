@@ -8,6 +8,7 @@ import eu.javaexperience.interfaces.simple.publish.SimplePublish1;
 import eu.javaexperience.interfaces.simple.publish.SimplePublish2;
 import eu.javaexperience.web.Context;
 import eu.javaexperience.web.Session;
+import eu.javaexperience.web.features.WebSocket;
 
 public interface ServiceProcessHooks
 {
@@ -19,4 +20,6 @@ public interface ServiceProcessHooks
 	public SimplePublish1<Context> afterRequestEnd();
 	
 	public GetBy2<Map<String,Object>, Context, Map<String,Object>> wrapContextForRender();
+	
+	public GetBy1<WebSocket, Context> upgradeWebsocket();
 }

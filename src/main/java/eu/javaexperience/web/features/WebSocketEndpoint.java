@@ -14,10 +14,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.javaexperience.collection.map.BulkTransitMap;
+import eu.javaexperience.interfaces.simple.getBy.GetBy1;
 import eu.javaexperience.interfaces.simple.publish.SimplePublish1;
 import eu.javaexperience.io.IOTools;
+import eu.javaexperience.patterns.behavioral.mediator.EventMediator;
 import eu.javaexperience.text.Format;
 import eu.javaexperience.web.Context;
+import eu.javaexperience.web.service.hooks.ServiceProcessHooks;
 
 public class WebSocketEndpoint implements WebSocket
 {
@@ -353,10 +356,15 @@ public class WebSocketEndpoint implements WebSocket
 	
 	public static WebSocket upgradeRequest(Context ctx) throws IOException
 	{
-		/*if(ctx.getRequest() instanceof HttpRequest)
+		ServiceProcessHooks hooks = ctx.getProcessHooks();
+		if(null != hooks)
 		{
-			return ((HttpRequest)ctx.getRequest()).getQuery().upgradeWebsocket();
-		}*/
+			GetBy1<WebSocket, Context> uw = hooks.upgradeWebsocket();
+			if(null != uw)
+			{
+				return uw.getBy(ctx);
+			}
+		}
 		
 		return upgradeHttpRequest(ctx.getRequest(), ctx.getResponse());
 	}

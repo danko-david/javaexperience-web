@@ -15,7 +15,6 @@ import eu.javaexperience.file.FileSystemTools;
 import eu.javaexperience.file.fs.os.OsFile;
 import eu.javaexperience.interfaces.simple.getBy.GetBy1;
 import eu.javaexperience.io.IOTools;
-import eu.javaexperience.io.file.FileTools;
 import eu.javaexperience.regex.RegexTools;
 
 public class TemplateManagerTools
@@ -56,7 +55,7 @@ public class TemplateManagerTools
 		return dir.getFileSystem().fromUri(sb.toString());
 	}
 	
-	public static <T extends Template> void parseAndPrepareViewInto
+	public static <T> void parseAndPrepareViewInto
 	(
 		Map<String, T> destination,
 		GetBy1<T, String> parser,
@@ -68,7 +67,7 @@ public class TemplateManagerTools
 		destination.put(viewName, parser.getBy(content));
 	}
 	
-	public static <T extends Template> Map<String, T> loadViewsFromDirRecursiveRaw
+	public static <T> Map<String, T> loadViewsFromDirRecursiveRaw
 	(
 		final Map<String, T> ret,
 		final GetBy1<T, String> parser,
@@ -127,7 +126,7 @@ public class TemplateManagerTools
 		return ret;*/
 	}
 	
-	public static <T extends Template> Map<String, T> loadViewsFromDirRecursiveRaw
+	public static <T> Map<String, T> loadViewsFromDirRecursiveRaw
 	(
 		final Map<String, T> ret,
 		final GetBy1<T, String> parser,

@@ -15,6 +15,7 @@ import eu.javaexperience.exceptions.OperationSuccessfullyEnded;
 import eu.javaexperience.interfaces.ExternalDataAttached;
 import eu.javaexperience.interfaces.simple.getBy.GetBy2;
 import eu.javaexperience.interfaces.simple.publish.SimplePublish1;
+import eu.javaexperience.interfaces.simple.publish.SimplePublish2;
 import eu.javaexperience.log.JavaExperienceLoggingFacility;
 import eu.javaexperience.log.LogLevel;
 import eu.javaexperience.log.Loggable;
@@ -23,6 +24,7 @@ import eu.javaexperience.log.LoggingTools;
 import eu.javaexperience.patterns.behavioral.cor.link.CorChainLink;
 import eu.javaexperience.patterns.behavioral.mediator.EventMediator;
 import eu.javaexperience.reflect.Mirror;
+import eu.javaexperience.text.Format;
 import eu.javaexperience.web.Context;
 import eu.javaexperience.web.MIME;
 import eu.javaexperience.web.RequestContext;
@@ -48,19 +50,38 @@ public class WebsiteTemplate extends HttpServlet implements ExternalDataAttached
 	
 	protected final SimplePublish1<Context> handle404;
 	protected final SimplePublish1<Context> handleApp;
+
+	protected final SimplePublish2<Context, Throwable> exceptionHandler;
 	
 	public static class WebsiteTemplateTemplateBuilder
 	{
+		public static final SimplePublish2<Context, Throwable> DEFAULT_EXCEPTION_HANDLER = (ctx, e)->
+		{
+			ctx.getResponse().setStatus(500);
+			ctx.getResponse().setContentType("text/plain; charset=utf-8");
+			try
+			{
+				ctx.getResponse().getOutputStream().write(Format.getPrintedStackTrace(e).getBytes());
+			}
+			catch (IOException e1)
+			{
+				Mirror.propagateAnyway(e1);
+			}
+		};
+
+		public static final GetBy2<Context, HttpServletRequest, HttpServletResponse> DEFAULT_CONTEXT_CREATOR = (req, resp)-> new RequestContext(req, resp);
+		
 		public SessionManager sessionManager = null;
 		public String sessionCookieName = "jvx-session";
 		
-		public GetBy2<Context, HttpServletRequest, HttpServletResponse> createContext = (req, resp)-> new RequestContext(req, resp);
+		public GetBy2<Context, HttpServletRequest, HttpServletResponse> createContext = DEFAULT_CONTEXT_CREATOR;
 		
 		public EventMediator<Entry<WebsiteTemplate, Context>> initContext = new EventMediator<>();
 		
 		public SimplePublish1<Context> handleApp;
 		
 		public SimplePublish1<Context> handle404;
+		public SimplePublish2<Context, Throwable> exceptionHandler = DEFAULT_EXCEPTION_HANDLER;
 		
 		public WebsiteTemplateTemplateBuilder defaultSessionManagement()
 		{
@@ -126,6 +147,7 @@ public class WebsiteTemplate extends HttpServlet implements ExternalDataAttached
 		this.sessionManager = builder.sessionManager;
 		this.sessionCookieName = builder.sessionCookieName;
 		this.initContext = new EventMediator<>();
+		this.exceptionHandler = builder.exceptionHandler;
 		
 		for(SimplePublish1<Entry<WebsiteTemplate, Context>> l:builder.initContext.getListeners())
 		{
@@ -210,7 +232,7 @@ public class WebsiteTemplate extends HttpServlet implements ExternalDataAttached
 		catch(Throwable e)
 		{
 			LoggingTools.tryLogFormatException(LOG, LogLevel.WARNING, e, "Exception while handling http request ");
-			Mirror.propagateAnyway(e);
+			exceptionHandler.publish(ctx, e);
 		}
 		finally
 		{

@@ -184,7 +184,7 @@ public class TemplateManagerTools
 		return ret;
 	}
 	
-	public static <T extends Template> Map<String, T> loadRecursiveWithDevelopementReload
+	public static <T> Map<String, T> loadRecursiveWithDevelopementReload
 	(
 		final File dir,
 		final GetBy1<T, String> parser,
@@ -224,7 +224,7 @@ public class TemplateManagerTools
 		return rt;*/
 	}
 	
-	public static <T extends Template> Map<String, T> loadRecursiveWithDevelopementReload
+	public static <T> Map<String, T> loadRecursiveWithDevelopementReload
 	(
 		final AbstractFile dir,
 		final GetBy1<T, String> parser,
